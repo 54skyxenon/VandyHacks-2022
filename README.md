@@ -2,6 +2,16 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Firebase
+
+### [Install the CLI](https://firebase.google.com/docs/cli#install_the_firebase_cli`)
+
+### `firebase login`
+
+### `npm run build`
+
+### `firebase deploy`
+
 ## Available Scripts
 
 In the project directory, you can run:
