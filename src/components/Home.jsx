@@ -30,9 +30,9 @@ const Home = () => {
       merchant: transaction.merchant,
       address: transaction.address,
       items: JSON.parse(transaction.items),
-      tax: transaction.tax.toFixed(2),
-      tip: transaction.tip.toFixed(2),
-      total: transaction.total.toFixed(2),
+      tax: transaction.tax,
+      tip: transaction.tip,
+      total: transaction.total,
       currency: transaction.currency,
       isShown: true
     });
@@ -126,7 +126,7 @@ const Home = () => {
                       <a href={"#"} onClick={() => handleDelete(transaction.rid)}> (Delete) </a>
                     </td>
                     <td>{transaction.merchant}</td>
-                    <td>{transaction.total.toFixed(2)} {transaction.currency}</td>
+                    <td>{transaction.total} {transaction.currency}</td>
                   </tr>
                 )}
               </tbody>
