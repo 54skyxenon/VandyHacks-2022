@@ -9,13 +9,12 @@ function Upload() {
   let [fileBlob, setFileBlob] = React.useState(EXAMPLE_FILE)
   
   const uploadFile = e => {
-    setFileBlob(URL.createObjectURL(e.target.files[0]))
     setFile(e.target.files[0])
+    setFileBlob(URL.createObjectURL(e.target.files[0]))
   }
 
   const getBase64 = () => {
     return new Promise(resolve => {
-      let baseURL = "";
       // Make new FileReader
       let reader = new FileReader();
 
@@ -24,8 +23,7 @@ function Upload() {
 
       // on reader load somthing...
       reader.onload = () => {
-        baseURL = reader.result;
-        resolve(baseURL);
+        resolve(reader.result);
       };
     });
   };
@@ -34,12 +32,10 @@ function Upload() {
     e.preventDefault()
 
     getBase64()
-      .then(async base64 => {
+      .then(async file => {
         const requestOptions = {
           method: 'POST',
-          body: JSON.stringify({
-            file: base64
-          })
+          body: JSON.stringify({ file })
         };
         const data = await (await fetch(VERYFI_ENDPOINT_PROXY, requestOptions)).json();
         console.log(data);
@@ -66,7 +62,6 @@ function Upload() {
             </div>
             <button className="btn btn-primary">Submit</button>
           </form>
-          
         </div>
       </div>
     </div>
