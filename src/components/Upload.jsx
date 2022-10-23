@@ -5,7 +5,7 @@ const EXAMPLE_FILE = 'https://artsmidnorthcoast.com/wp-content/uploads/2014/05/n
 const VERYFI_ENDPOINT_PROXY = 'https://transight-proxy.bwliang.workers.dev'
 const FLASK_ENDPOINT = 'http://127.0.0.1:5000/'
 
-function Upload() {
+const Upload = () => {
   let [file, setFile] = React.useState(null)
   let [fileBlob, setFileBlob] = React.useState(EXAMPLE_FILE)
   let [receiptData, setReceiptData] = React.useState({
