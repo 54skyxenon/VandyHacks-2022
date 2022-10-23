@@ -1,22 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 
-const EXAMPLE_FILE = 'https://artsmidnorthcoast.com/wp-content/uploads/2014/05/no-image-available-icon-6.png'
-const VERYFI_ENDPOINT_PROXY = 'https://transight-proxy.bwliang.workers.dev'
-const FLASK_ENDPOINT = 'http://127.0.0.1:5000/'
+import {EXAMPLE_FILE, VERYFI_ENDPOINT_PROXY, FLASK_ENDPOINT} from './constants';
 
 const Upload = () => {
   let [file, setFile] = React.useState(null)
   let [fileBlob, setFileBlob] = React.useState(EXAMPLE_FILE)
-  let [receiptData, setReceiptData] = React.useState({
-    date: "--",
-    address: "--",
-    merchant: "--",
-    items: [],
-    tax: "--",
-    total: "--",
-    image: "--"
-  })
+  let [receiptSuccess, setReceiptSuccess] = React.useState(false)
   
   const uploadFile = e => {
     setFile(e.target.files[0])
@@ -44,6 +34,7 @@ const Upload = () => {
         };
 
         const data = await (await fetch(VERYFI_ENDPOINT_PROXY, requestOptions)).json();
+        console.log(data)
 
         const purchase_items = []
         data.line_items.forEach(item => {
@@ -57,10 +48,11 @@ const Upload = () => {
           items: JSON.stringify(purchase_items),
           tax: data.tax,
           total: data.total,
-          image: data.pdf_url
+          currency: data.currency_code,
+          ref_number: data.reference_number
         }
 
-        await setReceiptData(newReceiptData)
+        await setReceiptSuccess(true)
         await persistToDB(newReceiptData)
       })
       .catch(err => {
@@ -73,8 +65,7 @@ const Upload = () => {
       method: 'POST',
       body: JSON.stringify(receipt)
     };
-    const res = await (await fetch(FLASK_ENDPOINT + 'data', requestOptions)).json()
-    console.log('BACKEND PERSIST = ' + JSON.stringify(res))
+    await (await fetch(FLASK_ENDPOINT + 'data', requestOptions)).json()
   }
 
   const processReceiptData = async e => {
@@ -99,13 +90,9 @@ const Upload = () => {
               </div>
             </div>
             <div className="form-group">
-              <p>Date = {receiptData.date}</p>
-              <p>Address = {receiptData.address}</p>
-              <p>Merchant = {receiptData.merchant}</p>
-              <p>Items = {String(receiptData.items)}</p>
-              <p>Tax = {receiptData.tax}</p>
-              <p>Total = {receiptData.total}</p>
-              <p>Image = {receiptData.image}</p>
+              {
+                receiptSuccess ? ("Successfully uploaded!") : ("")
+              }
             </div>
             <button className="btn btn-primary">Submit</button>
           </form>
