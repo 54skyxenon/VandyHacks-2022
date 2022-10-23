@@ -7,9 +7,6 @@ import {
   Navigation,
   Home,
   Upload,
-  Blog,
-  Posts,
-  Post,
 } from "./components";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -19,10 +16,6 @@ root.render(
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/upload" element={<Upload />} />
-      <Route path="/blog" element={<Blog />}>
-        <Route path="" element={<Posts />} />
-        <Route path=":postSlug" element={<Post />} />
-      </Route>
     </Routes>
   </Router>
 );
