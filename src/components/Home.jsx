@@ -16,11 +16,27 @@ const Home = () => {
     items: [],
     tax: "",
     tip: "",
-    total: ""
+    total: "",
+    currency: ""
   });
 
   const handleClose = () => setTransactionState({...transactionState, isShown: false});
-  const handleShow = () => setTransactionState({...transactionState, isShown: true});
+  const handleShow = transaction => {
+    console.log(typeof JSON.parse(transaction.items))
+    console.log("ITEMS: " + JSON.parse(transaction.items))
+    setTransactionState({
+      ...transactionState,
+      date: transaction.date,
+      merchant: transaction.merchant,
+      address: transaction.address,
+      items: JSON.parse(transaction.items),
+      tax: transaction.tax.toFixed(2),
+      tip: transaction.tip.toFixed(2),
+      total: transaction.total.toFixed(2),
+      currency: transaction.currency,
+      isShown: true
+    });
+  }
   const refreshPage = () => {window.location.reload()}
   const handleDelete = async rid => {
     const deleteOptions = {
@@ -36,14 +52,7 @@ const Home = () => {
       const backendData = await (await fetch(FLASK_ENDPOINT + 'data', {method: 'GET'})).json()
       const newTransactions = []
       backendData.receipts.forEach(transaction => {
-        newTransactions.push({
-          "rid": transaction.rid,
-          "date": transaction.date,
-          "merchant": transaction.merchant,
-          "total": transaction.total.toFixed(2),
-          "currency": transaction.currency,
-          "image": transaction.ref_number,
-        })
+        newTransactions.push(transaction)
       })
       setTransactions(newTransactions)
     }
@@ -59,13 +68,20 @@ const Home = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <h4>Date: {transactionState.date}</h4>
-            <h4>Merchant: {transactionState.merchant}</h4>
-            <h4>Address: {transactionState.address}</h4>
-            <h4>Items: {transactionState.items}</h4>
-            <h4>Tax: {transactionState.tax}</h4>
-            <h4>Tip: {transactionState.tip}</h4>
-            <h4>Total: {transactionState.total}</h4>
+            <h5><u>Date:</u> {transactionState.date}</h5>
+            <h5><u>Merchant:</u> {transactionState.merchant}</h5>
+            <h5><u>Address:</u> {transactionState.address}</h5>
+            <h5><u>Items:</u> </h5>
+            <ul>
+              {transactionState.items.map((item, j) => 
+                  <li key={j}>
+                    {item.name} - {item.price} {transactionState.currency}
+                  </li>
+              )}
+            </ul>
+            <h5><u>Tax:</u> {transactionState.tax} {transactionState.currency}</h5>
+            <h5><u>Tip:</u> {transactionState.tip} {transactionState.currency}</h5>
+            <h5><u>Total:</u> {transactionState.total} {transactionState.currency}</h5>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -106,11 +122,11 @@ const Home = () => {
                   <tr key={transaction.rid}>
                     <td>{i + 1}</td>
                     <td>{transaction.date}  
-                      <a href={"#"} onClick={handleShow}> (Click for details) </a>
+                      <a href={"#"} onClick={() => handleShow(transaction)}> (Click for details) </a>
                       <a href={"#"} onClick={() => handleDelete(transaction.rid)}> (Delete) </a>
                     </td>
                     <td>{transaction.merchant}</td>
-                    <td>{transaction.total} {transaction.currency}</td>
+                    <td>{transaction.total.toFixed(2)} {transaction.currency}</td>
                   </tr>
                 )}
               </tbody>

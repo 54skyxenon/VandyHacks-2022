@@ -47,6 +47,7 @@ const Upload = () => {
           merchant: data.vendor.name,
           items: JSON.stringify(purchase_items),
           tax: data.tax,
+          tip: data.tip,
           total: data.total,
           currency: data.currency_code,
           ref_number: data.reference_number
