@@ -7,6 +7,12 @@ const VERYFI_ENDPOINT_PROXY = 'https://transight-proxy.bwliang.workers.dev'
 function Upload() {
   let [file, setFile] = React.useState(null)
   let [fileBlob, setFileBlob] = React.useState(EXAMPLE_FILE)
+  let [receiptData, setReceiptData] = React.useState({
+    date: "--",
+    address: "--",
+    tax: "--",
+    total: "--"
+  })
   
   const uploadFile = e => {
     setFile(e.target.files[0])
@@ -37,7 +43,16 @@ function Upload() {
           method: 'POST',
           body: JSON.stringify({ file })
         };
+
         const data = await (await fetch(VERYFI_ENDPOINT_PROXY, requestOptions)).json();
+
+        setReceiptData({
+          date: data.date,
+          address: data.vendor.address,
+          tax: data.tax,
+          total: data.total
+        })
+
         console.log(data);
       })
       .catch(err => {
@@ -55,10 +70,30 @@ function Upload() {
               <input type="file" encType="multipart/form-data" className="form-control" id="fileUpload" onChange={uploadFile} />
             </div>
             <div className="form-group">
-              <label htmlFor="fileUpload">Preview:</label>
+              <label>Preview:</label>
               <div>
                 <img src={fileBlob} />
               </div>
+            </div>
+            <div className="form-group">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Tax</th>
+                    <th scope="col">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">{receiptData.date}</th>
+                    <td>{receiptData.address}</td>
+                    <td>{receiptData.tax}</td>
+                    <td>{receiptData.total}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <button className="btn btn-primary">Submit</button>
           </form>
