@@ -10,8 +10,11 @@ function Upload() {
   let [receiptData, setReceiptData] = React.useState({
     date: "--",
     address: "--",
+    merchant: "--",
+    items: [],
     tax: "--",
-    total: "--"
+    total: "--",
+    image: "--"
   })
   
   const uploadFile = e => {
@@ -19,24 +22,19 @@ function Upload() {
     setFileBlob(URL.createObjectURL(e.target.files[0]))
   }
 
+  // Transform file contents to base64 for API
   const getBase64 = () => {
     return new Promise(resolve => {
-      // Make new FileReader
       let reader = new FileReader();
-
-      // Convert the file to base64 text
       reader.readAsDataURL(file);
-
-      // on reader load somthing...
       reader.onload = () => {
         resolve(reader.result);
       };
     });
   };
 
-  const getReceiptData = async e => {
-    e.preventDefault()
-
+  // Call OCR API and set state here
+  const doOcr = async () => {
     getBase64()
       .then(async file => {
         const requestOptions = {
@@ -46,11 +44,19 @@ function Upload() {
 
         const data = await (await fetch(VERYFI_ENDPOINT_PROXY, requestOptions)).json();
 
+        const purchase_items = []
+        data.line_items.forEach(item => {
+          purchase_items.push({name: item.description, price: item.total})
+        })
+
         setReceiptData({
           date: data.date,
           address: data.vendor.address,
+          merchant: data.vendor.name,
+          items: JSON.stringify(purchase_items),
           tax: data.tax,
-          total: data.total
+          total: data.total,
+          image: data.pdf_url
         })
 
         console.log(data);
@@ -60,11 +66,22 @@ function Upload() {
       });
   }
 
+  const persistToDB = async () => {
+
+  }
+
+  const processReceiptData = async e => {
+    e.preventDefault()
+
+    await doOcr()
+    await persistToDB()
+  }
+
   return (
     <div className="Upload">
       <div className="container">
         <div className="column align-items-center my-5">
-          <form onSubmit={getReceiptData}>
+          <form onSubmit={processReceiptData}>
             <div className="form-group">
               <label htmlFor="fileUpload">Upload Receipt Image:</label>
               <input type="file" encType="multipart/form-data" className="form-control" id="fileUpload" onChange={uploadFile} />
@@ -76,24 +93,13 @@ function Upload() {
               </div>
             </div>
             <div className="form-group">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Address</th>
-                    <th scope="col">Tax</th>
-                    <th scope="col">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">{receiptData.date}</th>
-                    <td>{receiptData.address}</td>
-                    <td>{receiptData.tax}</td>
-                    <td>{receiptData.total}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <p>Date = {receiptData.date}</p>
+              <p>Address = {receiptData.address}</p>
+              <p>Merchant = {receiptData.merchant}</p>
+              <p>Items = {String(receiptData.items)}</p>
+              <p>Tax = {receiptData.tax}</p>
+              <p>Total = {receiptData.total}</p>
+              <p>Image = {receiptData.image}</p>
             </div>
             <button className="btn btn-primary">Submit</button>
           </form>

@@ -7,7 +7,7 @@ function Navigation() {
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
           <NavLink className="navbar-brand" to="/">
-            Transight
+            Transight - VandyHacks '22
           </NavLink>
           <div>
             <ul className="navbar-nav ml-auto">
