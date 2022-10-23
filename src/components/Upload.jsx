@@ -3,6 +3,7 @@ import React from "react";
 
 const EXAMPLE_FILE = 'https://artsmidnorthcoast.com/wp-content/uploads/2014/05/no-image-available-icon-6.png'
 const VERYFI_ENDPOINT_PROXY = 'https://transight-proxy.bwliang.workers.dev'
+const FLASK_ENDPOINT = 'http://127.0.0.1:5000/'
 
 function Upload() {
   let [file, setFile] = React.useState(null)
@@ -49,7 +50,7 @@ function Upload() {
           purchase_items.push({name: item.description, price: item.total})
         })
 
-        setReceiptData({
+        const newReceiptData = {
           date: data.date,
           address: data.vendor.address,
           merchant: data.vendor.name,
@@ -57,24 +58,29 @@ function Upload() {
           tax: data.tax,
           total: data.total,
           image: data.pdf_url
-        })
+        }
 
-        console.log(data);
+        await setReceiptData(newReceiptData)
+        await persistToDB(newReceiptData)
       })
       .catch(err => {
         console.log(err);
       });
   }
 
-  const persistToDB = async () => {
-
+  const persistToDB = async receipt => {
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(receipt)
+    };
+    const res = await (await fetch(FLASK_ENDPOINT + 'data', requestOptions)).json()
+    console.log('BACKEND PERSIST = ' + JSON.stringify(res))
   }
 
   const processReceiptData = async e => {
     e.preventDefault()
 
     await doOcr()
-    await persistToDB()
   }
 
   return (
